@@ -101,7 +101,7 @@ Args:
 Returns:
     Api: Column array for Ap in intertial axis
 """
-def Rvbti(Apb, A):
+def Tbti(Apb, A):
 
     phi   = A[0, 0]
     theta = A[1, 0]
@@ -126,7 +126,7 @@ Args:
 Returns:
     Apb: Column array for Ap in body axis
 """
-def Rvbti(Apb, A):
+def Titb(Api, A):
 
     phi   = A[0, 0]
     theta = A[1, 0]
@@ -136,6 +136,6 @@ def Rvbti(Apb, A):
                      [0, np.cos(phi), np.cos(theta)*np.sin(phi)],
                      [0, -np.sin(phi), np.cos(phi)*np.cos(theta)]])
     
-    Apb = Ritb @ Apb
+    Apb = Ritb @ Api
 
     return Apb
