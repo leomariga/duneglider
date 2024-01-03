@@ -1,4 +1,4 @@
-# duneglider
+# Dune Glider
 A python model for a small glider.
 
 ## Newthon-Euler modeling
@@ -8,4 +8,5 @@ Just add a bunch of `Force` elements in your plane and run the simulation to see
 Add `Probe` to the signal you want to observe throughout the simulation and call `plot()` command. You can observe aircraft's states, forces or any numpy element you want.
 
 ## How to run
-Run `step.py`.
+- Add your AVL path `duneglider/f_util/avl_config.cfg`
+- Run `step.py`.
