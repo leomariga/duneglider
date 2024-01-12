@@ -1,17 +1,17 @@
 [tool.poetry]
 name = "duneglider"
 version = "0.1.0"
-description = "A small glider model"
+description = "A small glider"
 authors = ["Leonardo Mariga <leomariga@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-numpy = "^1.26.2"
-pytest = "^7.4.4"
-matplotlib = "^3.8.2"
-avlwrapper = "^0.4.0"
+aerosandbox = {path = "D:/gitd/AeroSandbox"}
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.28.0"
 
 [build-system]
 requires = ["poetry-core"]
