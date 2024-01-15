@@ -11,6 +11,10 @@ aerosandbox = {path = "D:/gitd/AeroSandbox"}
 plotly = "^5.18.0"
 ipywidgets = "^8.1.1"
 ipympl = "^0.9.3"
+pyvista = "^0.43.2"
+ipykernel = "^6.28.0"
+nbformat = "^5.9.2"
+trame = "^3.5.1"
 
 
 [tool.poetry.group.dev.dependencies]
