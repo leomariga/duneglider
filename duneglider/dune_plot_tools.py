@@ -2,17 +2,13 @@ import matplotlib.pyplot as plt
 import aerosandbox.tools.pretty_plots as p
 import aerosandbox as asb
 
-import plotly.graph_objects as go
-from ipywidgets import widgets
-from IPython.display import display
-from plotly.subplots import make_subplots
+from IPython.display import display, clear_output
 import aerosandbox.numpy as np
 from dataclasses import dataclass
-
 from dune_opt import OptScore
 
 def plot_polars(aero, method_name='',):
-    fig, ax = plt.subplots(3, 1, figsize=(7, 9), dpi=100)
+    fig, ax = plt.subplots(3, 1, figsize=(9, 9), dpi=100)
 
     plt.sca(ax[0])
     p.plot_smooth(
@@ -60,6 +56,7 @@ def plot_polars(aero, method_name='',):
     )
     p.show_plot(legend=False)
 
+
 def plot_opt_score(optscore: OptScore):
     
     @dataclass
@@ -77,6 +74,7 @@ def plot_opt_score(optscore: OptScore):
     
     def get_points_local_min():
         plot_point_list = []
+        print(len(optscore.local_min_list))
         for id_local_min_element in range(len(optscore.local_min_list)):
             local_min_element = optscore.local_min_list[id_local_min_element]
 
@@ -106,31 +104,42 @@ def plot_opt_score(optscore: OptScore):
     lm_points = get_points_local_min()
     x_data = []
     y_data = []
+    z_data = []
     for lm in lm_points:
-        x_data.append(lm['cl_in_alpha_max_clcd'])
-        y_data.append(lm['max_clcd'])
+        x_data.append(lm.cl_in_alpha_max_clcd)
+        y_data.append(lm.max_clcd)
+        z_data.append(lm.score_p)
 
-    # Create the first scatter plot in FigureWidget
-    fig1 = go.FigureWidget(data=[go.Scatter(x=x_data, y=y_data, mode='markers')])
+    # Create a scatter plot
+    fig, ax = plt.subplots()
+    scatter = ax.scatter(x_data, y_data, c=z_data, cmap='coolwarm')
+    
+    ax.set_title("Optimization score")
+    ax.set_xlabel("$C_L$ [-]")
+    ax.set_ylabel("$C_L / C_D$ [-]")
 
-    # Create the second plot in FigureWidget with an initial layout
-    fig2 = go.FigureWidget(data=[go.Scatter(x=[0], y=[0], mode='lines', line=dict(color='red'))])
+    # Function to execute on click event
+    def on_click(event):
+        if event.inaxes == ax:
+            x_click, y_click = event.xdata, event.ydata
+            distances = [(xi - x_click)**2 + (yi - y_click)**2 for xi, yi in zip(x_data, y_data)]
+            min_distance_index = distances.index(min(distances))
+            clear_output()
+            idptn = min_distance_index
+            print(f'Clicked on Point {min_distance_index + 1}')
+            plot_opt_score(optscore)
+            print(f"wing_root_chord: {lm_points[idptn].x[0]}")
+            print(f"wing_tip_chord: {lm_points[idptn].x[1]}")
+            print(f"wing_sweep: {lm_points[idptn].x[2]*180/np.pi}")
+            airplane_clicked = lm_points[idptn].airplane
+            airplaneplot = airplane_clicked.draw_three_view()
+            plot_polars(lm_points[idptn].aero, "AeroBuildup method")
 
-    # Display the first figure
-    display(fig1)
+    # Connect the click event to the figure
+    fig.canvas.mpl_connect('button_press_event', on_click)
+    plt.colorbar(scatter)
+    plt.show()
 
-    # Display the second figure
-    display(fig2)
 
-    # Define on_click callback to update the second plot
-    def on_click(trace, points, state):
-        if points.xs:
-            x_coord = points.xs[0]
-            y_coord = points.ys[0]
 
-            # Update the second plot with a line from (0, 0) to the clicked point
-            fig2.data[0].x = [0, x_coord]
-            fig2.data[0].y = [0, y_coord]
 
-    # Assign on_click callback to the scatter trace in the first figure
-    fig1.data[0].on_click(on_click)
